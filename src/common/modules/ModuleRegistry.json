@@ -1,0 +1,274 @@
+[
+  {
+    "id": "FancyZones",
+    "displayName": "FancyZones",
+    "loadPath": "PowerToys.FancyZonesModuleInterface.dll",
+    "settingsWindow": "FancyZones",
+    "category": "WindowManagement",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "PowerPreview",
+    "displayName": "File Explorer add-ons",
+    "loadPath": "PowerToys.powerpreview.dll",
+    "settingsWindow": "PowerPreview",
+    "category": "FileExplorer",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "ImageResizer",
+    "displayName": "Image Resizer",
+    "loadPath": "WinUI3Apps/PowerToys.ImageResizerExt.dll",
+    "settingsWindow": "ImageResizer",
+    "category": "FileExplorer",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "KeyboardManager",
+    "displayName": "Keyboard Manager",
+    "loadPath": "PowerToys.KeyboardManager.dll",
+    "settingsWindow": "KBM",
+    "category": "Input",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "Launcher",
+    "displayName": "PowerToys Run",
+    "loadPath": "PowerToys.Launcher.dll",
+    "settingsWindow": "PowerLauncher",
+    "category": "Launcher",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "PowerRename",
+    "displayName": "PowerRename",
+    "loadPath": "WinUI3Apps/PowerToys.PowerRenameExt.dll",
+    "settingsWindow": "PowerRename",
+    "category": "FileExplorer",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "ShortcutGuide",
+    "displayName": "Shortcut Guide",
+    "loadPath": "PowerToys.ShortcutGuideModuleInterface.dll",
+    "settingsWindow": "ShortcutGuide",
+    "category": "Input",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "ColorPicker",
+    "displayName": "Color Picker",
+    "loadPath": "PowerToys.ColorPicker.dll",
+    "settingsWindow": "ColorPicker",
+    "category": "Capture",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "Awake",
+    "displayName": "Awake",
+    "loadPath": "PowerToys.AwakeModuleInterface.dll",
+    "settingsWindow": "Awake",
+    "category": "System",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "FindMyMouse",
+    "displayName": "Find My Mouse",
+    "loadPath": "PowerToys.FindMyMouse.dll",
+    "settingsWindow": "MouseUtils",
+    "category": "Mouse",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "MouseHighlighter",
+    "displayName": "Mouse Highlighter",
+    "loadPath": "PowerToys.MouseHighlighter.dll",
+    "settingsWindow": "MouseUtils",
+    "category": "Mouse",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "MouseJump",
+    "displayName": "Mouse Jump",
+    "loadPath": "PowerToys.MouseJump.dll",
+    "settingsWindow": "MouseUtils",
+    "category": "Mouse",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "AlwaysOnTop",
+    "displayName": "Always On Top",
+    "loadPath": "PowerToys.AlwaysOnTopModuleInterface.dll",
+    "settingsWindow": "AlwaysOnTop",
+    "category": "WindowManagement",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "MousePointerCrosshairs",
+    "displayName": "Mouse Pointer Crosshairs",
+    "loadPath": "PowerToys.MousePointerCrosshairs.dll",
+    "settingsWindow": "MouseUtils",
+    "category": "Mouse",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "CursorWrap",
+    "displayName": "Cursor Wrap",
+    "loadPath": "PowerToys.CursorWrap.dll",
+    "settingsWindow": "MouseUtils",
+    "category": "Mouse",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "PowerAccent",
+    "displayName": "Quick Accent",
+    "loadPath": "PowerToys.PowerAccentModuleInterface.dll",
+    "settingsWindow": "PowerAccent",
+    "category": "Input",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "PowerOCR",
+    "displayName": "Text Extractor",
+    "loadPath": "PowerToys.PowerOCRModuleInterface.dll",
+    "settingsWindow": "PowerOCR",
+    "category": "Capture",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "AdvancedPaste",
+    "displayName": "Advanced Paste",
+    "loadPath": "PowerToys.AdvancedPasteModuleInterface.dll",
+    "settingsWindow": "AdvancedPaste",
+    "category": "Clipboard",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "FileLocksmith",
+    "displayName": "File Locksmith",
+    "loadPath": "WinUI3Apps/PowerToys.FileLocksmithExt.dll",
+    "settingsWindow": "FileLocksmith",
+    "category": "FileExplorer",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "RegistryPreview",
+    "displayName": "Registry Preview",
+    "loadPath": "WinUI3Apps/PowerToys.RegistryPreviewExt.dll",
+    "settingsWindow": "RegistryPreview",
+    "category": "System",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "MeasureTool",
+    "displayName": "Screen Ruler",
+    "loadPath": "WinUI3Apps/PowerToys.MeasureToolModuleInterface.dll",
+    "settingsWindow": "MeasureTool",
+    "category": "Capture",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "NewPlus",
+    "displayName": "New+",
+    "loadPath": "WinUI3Apps/PowerToys.NewPlus.ShellExtension.dll",
+    "settingsWindow": "NewPlus",
+    "category": "FileExplorer",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "Hosts",
+    "displayName": "Hosts File Editor",
+    "loadPath": "WinUI3Apps/PowerToys.HostsModuleInterface.dll",
+    "settingsWindow": "Hosts",
+    "category": "System",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "Peek",
+    "displayName": "Peek",
+    "loadPath": "WinUI3Apps/PowerToys.Peek.dll",
+    "settingsWindow": "Peek",
+    "category": "FileExplorer",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "EnvironmentVariables",
+    "displayName": "Environment Variables",
+    "loadPath": "WinUI3Apps/PowerToys.EnvironmentVariablesModuleInterface.dll",
+    "settingsWindow": "EnvironmentVariables",
+    "category": "System",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "MouseWithoutBorders",
+    "displayName": "Mouse Without Borders",
+    "loadPath": "PowerToys.MouseWithoutBordersModuleInterface.dll",
+    "settingsWindow": "MouseWithoutBorders",
+    "category": "Mouse",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "CropAndLock",
+    "displayName": "Crop And Lock",
+    "loadPath": "PowerToys.CropAndLockModuleInterface.dll",
+    "settingsWindow": "CropAndLock",
+    "category": "WindowManagement",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "CmdNotFound",
+    "displayName": "Command Not Found",
+    "loadPath": "PowerToys.CmdNotFoundModuleInterface.dll",
+    "settingsWindow": "CmdNotFound",
+    "category": "CommandLine",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "Workspaces",
+    "displayName": "Workspaces",
+    "loadPath": "PowerToys.WorkspacesModuleInterface.dll",
+    "settingsWindow": "Workspaces",
+    "category": "WindowManagement",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "CmdPal",
+    "displayName": "Command Palette",
+    "loadPath": "PowerToys.CmdPalModuleInterface.dll",
+    "settingsWindow": "CmdPal",
+    "category": "Launcher",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "ZoomIt",
+    "displayName": "ZoomIt",
+    "loadPath": "PowerToys.ZoomItModuleInterface.dll",
+    "settingsWindow": "ZoomIt",
+    "category": "Capture",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "LightSwitch",
+    "displayName": "Light Switch",
+    "loadPath": "PowerToys.LightSwitchModuleInterface.dll",
+    "settingsWindow": "LightSwitch",
+    "category": "System",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "PowerDisplay",
+    "displayName": "PowerDisplay",
+    "loadPath": "PowerToys.PowerDisplayModuleInterface.dll",
+    "settingsWindow": "PowerDisplay",
+    "category": "Display",
+    "source": "UpstreamPowerToys"
+  },
+  {
+    "id": "GrabAndMove",
+    "displayName": "Grab And Move",
+    "loadPath": "PowerToys.GrabAndMoveModuleInterface.dll",
+    "settingsWindow": "GrabAndMove",
+    "category": "WindowManagement",
+    "source": "UpstreamPowerToys"
+  }
+]
