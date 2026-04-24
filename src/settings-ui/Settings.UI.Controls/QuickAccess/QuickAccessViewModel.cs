@@ -87,6 +87,11 @@ namespace Microsoft.PowerToys.Settings.UI.Controls
 
         private void AddFlyoutMenuItem(ModuleType moduleType)
         {
+            if (!PersonalModuleRegistryHelper.IsModuleVisible(moduleType))
+            {
+                return;
+            }
+
             if (_isModuleGpoDisabled(moduleType))
             {
                 return;

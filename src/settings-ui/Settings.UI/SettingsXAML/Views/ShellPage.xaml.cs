@@ -14,6 +14,7 @@ using ManagedCommon;
 using Microsoft.PowerToys.Settings.UI.Controls;
 using Microsoft.PowerToys.Settings.UI.Helpers;
 using Microsoft.PowerToys.Settings.UI.Library;
+using Microsoft.PowerToys.Settings.UI.Library.Helpers;
 using Microsoft.PowerToys.Settings.UI.Library.Utilities;
 using Microsoft.PowerToys.Settings.UI.Services;
 using Microsoft.PowerToys.Settings.UI.ViewModels;
@@ -119,6 +120,7 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             DataContext = ViewModel;
             ShellHandler = this;
             ViewModel.Initialize(shellFrame, navigationView, KeyboardAccelerators);
+            ApplyPersonalModuleVisibility();
 
             // NL moved navigation to general page to the moment when the window is first activated (to not make flyout window disappear)
             // shellFrame.Navigate(typeof(GeneralPage));
@@ -134,7 +136,7 @@ namespace Microsoft.PowerToys.Settings.UI.Views
 
             foreach (var parent in topLevelItems)
             {
-                foreach (var child in parent.MenuItems.OfType<NavigationViewItem>())
+                foreach (var child in parent.MenuItems.OfType<NavigationViewItem>().Where(item => item.Visibility == Visibility.Visible))
                 {
                     _navViewParentLookup.TryAdd(child.GetValue(NavHelper.NavigateToProperty) as Type, parent);
                     _searchSuggestions.Add(child.Content?.ToString());
@@ -146,6 +148,26 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             {
                 DispatcherQueue.TryEnqueue(UpdateGeneralInfoBadge);
             });
+        }
+
+        private void ApplyPersonalModuleVisibility()
+        {
+            foreach (var parent in navigationView.MenuItems.OfType<NavigationViewItem>())
+            {
+                var children = parent.MenuItems.OfType<NavigationViewItem>().ToArray();
+                if (children.Length == 0)
+                {
+                    continue;
+                }
+
+                foreach (var child in children)
+                {
+                    var pageType = child.GetValue(NavHelper.NavigateToProperty) as Type;
+                    child.Visibility = PersonalModuleRegistryHelper.IsSettingsPageVisible(pageType?.Name) ? Visibility.Visible : Visibility.Collapsed;
+                }
+
+                parent.Visibility = children.Any(child => child.Visibility == Visibility.Visible) ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
         public static int SendDefaultIPCMessage(string msg)

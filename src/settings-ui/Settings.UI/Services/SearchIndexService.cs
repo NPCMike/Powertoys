@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.Search.FuzzSearch;
 using Microsoft.PowerToys.Settings.UI.Helpers;
+using Microsoft.PowerToys.Settings.UI.Library.Helpers;
 using Microsoft.PowerToys.Settings.UI.Views;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Settings.UI.Library;
@@ -244,7 +245,7 @@ namespace Microsoft.PowerToys.Settings.UI.Services
                     if (score > 0)
                     {
                         var pageType = GetPageTypeFromName(entry.PageTypeName);
-                        if (pageType != null)
+                        if (pageType != null && PersonalModuleRegistryHelper.IsSettingsPageVisible(pageType.Name))
                         {
                             bag.Add((entry, score));
                         }

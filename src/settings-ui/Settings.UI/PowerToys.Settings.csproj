@@ -210,4 +210,12 @@
 		<Message Importance="high" Text="[Settings] Building XamlIndexBuilder prior to compile. Views='$(MSBuildProjectDirectory)\SettingsXAML\Views' Out='$(GeneratedJsonFile)'" />
 		<MSBuild Projects="..\Settings.UI.XamlIndexBuilder\Settings.UI.XamlIndexBuilder.csproj" Targets="Build" Properties="Configuration=$(Configuration);Platform=Any CPU;TargetFramework=$(CoreTargetFramework);XamlViewsDir=$(MSBuildProjectDirectory)\SettingsXAML\Views;GeneratedJsonFile=$(GeneratedJsonFile)" />
 	</Target>
+
+	<Target Name="CopyPersonalModuleRegistryFiles" AfterTargets="Build">
+		<Message Importance="high" Text="[Settings] Copying personal module registry files to output folders." />
+		<MakeDir Directories="$(OutDir)\..\modules" />
+		<MakeDir Directories="$(RepoRoot)$(Platform)\$(Configuration)\modules" />
+		<Copy SourceFiles="$(RepoRoot)src\common\modules\ModuleRegistry.json;$(RepoRoot)src\common\modules\EnabledModules.personal.json" DestinationFolder="$(OutDir)\..\modules" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(RepoRoot)src\common\modules\ModuleRegistry.json;$(RepoRoot)src\common\modules\EnabledModules.personal.json" DestinationFolder="$(RepoRoot)$(Platform)\$(Configuration)\modules" SkipUnchangedFiles="true" />
+	</Target>
 </Project>

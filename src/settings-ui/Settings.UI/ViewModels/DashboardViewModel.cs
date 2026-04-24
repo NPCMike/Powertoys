@@ -213,6 +213,11 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
                     continue;
                 }
 
+                if (!PersonalModuleRegistryHelper.IsModuleVisible(moduleType))
+                {
+                    continue;
+                }
+
                 GpoRuleConfigured gpo = ModuleGpoHelper.GetModuleGpoConfiguration(moduleType);
                 var newItem = new DashboardListItem()
                 {

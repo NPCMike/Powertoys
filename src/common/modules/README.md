@@ -35,7 +35,8 @@ Current profile intent:
 2. Add an enabled-modules profile for the personal fork.
 3. Teach the runner to read DLL load paths from the registry with a hard-coded fallback.
 4. Filter runner module loading through `EnabledModules.personal.json` with registry fallback behavior.
-5. Move settings page mapping after the runner path is stable.
-6. Leave GPO, installer, hotkey, and IPC migration for later explicit phases.
+5. Filter Settings UI navigation, dashboard, quick access, and search through the same personal profile.
+6. Move settings page mapping fully into registry data after the runner and Settings UI paths are stable.
+7. Leave GPO, installer, hotkey, and IPC migration for later explicit phases.
 
 This keeps the first step low-risk while still giving future module add/remove work a concrete place to converge.
