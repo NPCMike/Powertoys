@@ -60,12 +60,14 @@ namespace Microsoft.PowerToys.Settings.UI.Library.Helpers
             ["AdvancedPastePage"] = [ModuleType.AdvancedPaste],
             ["AlwaysOnTopPage"] = [ModuleType.AlwaysOnTop],
             ["AwakePage"] = [ModuleType.Awake],
+            ["CmdNotFoundPage"] = [],
             ["CmdPalPage"] = [ModuleType.CmdPal],
             ["ColorPickerPage"] = [ModuleType.ColorPicker],
             ["CropAndLockPage"] = [ModuleType.CropAndLock],
             ["EnvironmentVariablesPage"] = [ModuleType.EnvironmentVariables],
             ["FancyZonesPage"] = [ModuleType.FancyZones],
             ["FileLocksmithPage"] = [ModuleType.FileLocksmith],
+            ["GrabAndMovePage"] = [ModuleType.GrabAndMove],
             ["HostsPage"] = [ModuleType.Hosts],
             ["ImageResizerPage"] = [ModuleType.ImageResizer],
             ["KeyboardManagerPage"] = [ModuleType.KeyboardManager],
@@ -107,7 +109,7 @@ namespace Microsoft.PowerToys.Settings.UI.Library.Helpers
 
             if (!SettingsPageNameToModuleTypes.TryGetValue(pageTypeName, out var moduleTypes))
             {
-                return true;
+                return EnabledModuleTypes.Value.Count == 0;
             }
 
             return moduleTypes.Any(IsModuleVisible);
