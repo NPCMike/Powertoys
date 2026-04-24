@@ -106,6 +106,7 @@ If you want to build your own extensions for Command Palette, check out the [Com
 - [Coding Style](development/style.md) - Code formatting and style conventions
 - [Logging and Telemetry](development/logging.md) - How to use logging and telemetry
 - [Localization](development/localization.md) - How to support multiple languages
+- [Personal PowerToys Fork Plan](development/personal-powertoys-fork-plan.zh-TW.md) - 個人化 PowerToys fork 與模組架構改造計畫
 - [UI Testing](development/ui-tests.md) - How to write UI tests for PowerToys
 - [Developing with VS Code](development/dev-with-vscode.md) - Build, debug, and contribute using VS Code
 
