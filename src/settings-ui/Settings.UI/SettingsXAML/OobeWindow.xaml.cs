@@ -3,8 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Linq;
 using ManagedCommon;
 using Microsoft.PowerToys.Settings.UI.Helpers;
+using Microsoft.PowerToys.Settings.UI.OOBE;
 using Microsoft.PowerToys.Settings.UI.OOBE.ViewModel;
 using Microsoft.PowerToys.Settings.UI.OOBE.Views;
 using Microsoft.UI.Xaml;
@@ -167,10 +169,24 @@ namespace Microsoft.PowerToys.Settings.UI
 
         private void NavigationView_Loaded(object sender, RoutedEventArgs e)
         {
+            ApplyPersonalModuleVisibility();
+
             // Select the first module by default
-            if (navigationView.MenuItems.Count > 0)
+            var firstVisibleItem = navigationView.MenuItems
+                .OfType<NavigationViewItem>()
+                .FirstOrDefault(item => item.Visibility == Visibility.Visible);
+
+            if (firstVisibleItem != null)
             {
-                navigationView.SelectedItem = navigationView.MenuItems[0];
+                navigationView.SelectedItem = firstVisibleItem;
+            }
+        }
+
+        private void ApplyPersonalModuleVisibility()
+        {
+            foreach (var item in navigationView.MenuItems.OfType<NavigationViewItem>())
+            {
+                item.Visibility = OobeModuleVisibilityHelper.IsVisible(item.Tag as string) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
     }

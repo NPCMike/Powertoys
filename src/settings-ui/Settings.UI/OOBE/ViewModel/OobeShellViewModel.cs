@@ -5,6 +5,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Microsoft.PowerToys.Settings.UI.OOBE;
 using Microsoft.PowerToys.Settings.UI.OOBE.Enums;
 
 namespace Microsoft.PowerToys.Settings.UI.OOBE.ViewModel
@@ -50,6 +51,7 @@ namespace Microsoft.PowerToys.Settings.UI.OOBE.ViewModel
             (PowerToysModules.NewPlus, false),
             (PowerToysModules.ZoomIt, false),
             }
+            .Where(x => OobeModuleVisibilityHelper.IsVisible(x.Module.ToString()))
             .Select(x => new OobePowerToysModule
             {
                 ModuleName = x.Module.ToString(),
