@@ -103,6 +103,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="runner.base.rc" />
+    <CopyFileToFolders Include="..\common\modules\ModuleRegistry.json">
+      <DeploymentContent>true</DeploymentContent>
+      <FileType>Document</FileType>
+      <DestinationFolders>$(OutDir)\modules</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\common\modules\EnabledModules.personal.json">
+      <DeploymentContent>true</DeploymentContent>
+      <FileType>Document</FileType>
+      <DestinationFolders>$(OutDir)\modules</DestinationFolders>
+    </CopyFileToFolders>
     <ResourceCompile Include="Generated Files/runner.rc" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +200,12 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="$(RepoRoot)deps\spdlog.props" />
+  <Target Name="CopyPersonalModuleRegistryFiles" AfterTargets="Build">
+    <MakeDir Directories="$(OutDir)\modules" />
+    <MakeDir Directories="$(RepoRoot)$(Platform)\$(Configuration)\modules" />
+    <Copy SourceFiles="..\common\modules\ModuleRegistry.json;..\common\modules\EnabledModules.personal.json" DestinationFolder="$(OutDir)\modules" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\common\modules\ModuleRegistry.json;..\common\modules\EnabledModules.personal.json" DestinationFolder="$(RepoRoot)$(Platform)\$(Configuration)\modules" SkipUnchangedFiles="true" />
+  </Target>
   <!-- Deduplicate WindowsAppRuntimeAutoInitializer.cpp (added twice via transitive imports causing LNK4042). Remove all then add exactly once. -->
   <Target Name="FixWinAppSDKAutoInitializer" BeforeTargets="ClCompile" AfterTargets="WindowsAppRuntimeAutoInitializer">
     <ItemGroup>

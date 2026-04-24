@@ -2,6 +2,8 @@
 #include <ShellScalingApi.h>
 #include <lmcons.h>
 #include <filesystem>
+#include <fstream>
+#include <iterator>
 #include <sstream>
 #include "tray_icon.h"
 #include "powertoy_module.h"
@@ -53,6 +55,7 @@
 #include <common/version/version.h>
 #include <common/utils/string_utils.h>
 #include <common/utils/gpo.h>
+#include <common/utils/json.h>
 
 // disabling warning 4458 - declaration of 'identifier' hides class member
 // to avoid warnings from GDI files - can't add winRT directory to external code
@@ -66,6 +69,132 @@ namespace
 {
     const wchar_t PT_URI_PROTOCOL_SCHEME[] = L"powertoys://";
     const wchar_t POWER_TOYS_MODULE_LOAD_FAIL[] = L"Failed to load "; // Module name will be appended on this message and it is not localized.
+    const wchar_t MODULE_REGISTRY_FILE_NAME[] = L"ModuleRegistry.json";
+
+    std::vector<std::wstring> get_default_module_load_paths()
+    {
+        return {
+            L"PowerToys.FancyZonesModuleInterface.dll",
+            L"PowerToys.powerpreview.dll",
+            L"WinUI3Apps/PowerToys.ImageResizerExt.dll",
+            L"PowerToys.KeyboardManager.dll",
+            L"PowerToys.Launcher.dll",
+            L"WinUI3Apps/PowerToys.PowerRenameExt.dll",
+            L"PowerToys.ShortcutGuideModuleInterface.dll",
+            L"PowerToys.ColorPicker.dll",
+            L"PowerToys.AwakeModuleInterface.dll",
+            L"PowerToys.FindMyMouse.dll",
+            L"PowerToys.MouseHighlighter.dll",
+            L"PowerToys.MouseJump.dll",
+            L"PowerToys.AlwaysOnTopModuleInterface.dll",
+            L"PowerToys.MousePointerCrosshairs.dll",
+            L"PowerToys.CursorWrap.dll",
+            L"PowerToys.PowerAccentModuleInterface.dll",
+            L"PowerToys.PowerOCRModuleInterface.dll",
+            L"PowerToys.AdvancedPasteModuleInterface.dll",
+            L"WinUI3Apps/PowerToys.FileLocksmithExt.dll",
+            L"WinUI3Apps/PowerToys.RegistryPreviewExt.dll",
+            L"WinUI3Apps/PowerToys.MeasureToolModuleInterface.dll",
+            L"WinUI3Apps/PowerToys.NewPlus.ShellExtension.dll",
+            L"WinUI3Apps/PowerToys.HostsModuleInterface.dll",
+            L"WinUI3Apps/PowerToys.Peek.dll",
+            L"WinUI3Apps/PowerToys.EnvironmentVariablesModuleInterface.dll",
+            L"PowerToys.MouseWithoutBordersModuleInterface.dll",
+            L"PowerToys.CropAndLockModuleInterface.dll",
+            L"PowerToys.CmdNotFoundModuleInterface.dll",
+            L"PowerToys.WorkspacesModuleInterface.dll",
+            L"PowerToys.CmdPalModuleInterface.dll",
+            L"PowerToys.ZoomItModuleInterface.dll",
+            L"PowerToys.LightSwitchModuleInterface.dll",
+            L"PowerToys.PowerDisplayModuleInterface.dll",
+            L"PowerToys.GrabAndMoveModuleInterface.dll",
+        };
+    }
+
+    std::vector<std::filesystem::path> get_module_registry_candidate_paths()
+    {
+        const std::filesystem::path executableFolder{ get_module_folderpath() };
+
+        return {
+            executableFolder / L"modules" / MODULE_REGISTRY_FILE_NAME,
+            executableFolder / MODULE_REGISTRY_FILE_NAME,
+            executableFolder.parent_path().parent_path() / L"src" / L"common" / L"modules" / MODULE_REGISTRY_FILE_NAME,
+        };
+    }
+
+    std::optional<std::vector<std::wstring>> try_load_module_registry(const std::filesystem::path& registryPath)
+    {
+        try
+        {
+            if (!std::filesystem::exists(registryPath))
+            {
+                return std::nullopt;
+            }
+
+            std::ifstream file(registryPath, std::ios::binary);
+            if (!file.is_open())
+            {
+                Logger::warn(L"Module registry exists but cannot be opened: {}", registryPath.wstring());
+                return std::nullopt;
+            }
+
+            const std::string registryJson{ std::istreambuf_iterator<char>{ file }, std::istreambuf_iterator<char>{} };
+            const auto registryValue = json::JsonValue::Parse(winrt::to_hstring(registryJson));
+            if (registryValue.ValueType() != json::JsonValueType::Array)
+            {
+                Logger::warn(L"Module registry is not a JSON array: {}", registryPath.wstring());
+                return std::nullopt;
+            }
+
+            std::vector<std::wstring> moduleLoadPaths;
+            for (const auto& moduleValue : registryValue.GetArray())
+            {
+                if (moduleValue.ValueType() != json::JsonValueType::Object)
+                {
+                    Logger::warn(L"Module registry contains a non-object entry: {}", registryPath.wstring());
+                    return std::nullopt;
+                }
+
+                const auto moduleObject = moduleValue.GetObjectW();
+                const std::wstring loadPath = moduleObject.GetNamedString(L"loadPath", L"").c_str();
+                if (loadPath.empty())
+                {
+                    Logger::warn(L"Module registry entry is missing loadPath: {}", registryPath.wstring());
+                    return std::nullopt;
+                }
+
+                moduleLoadPaths.emplace_back(loadPath);
+            }
+
+            if (moduleLoadPaths.empty())
+            {
+                Logger::warn(L"Module registry has no loadable entries: {}", registryPath.wstring());
+                return std::nullopt;
+            }
+
+            Logger::info(L"Loaded {} module entries from registry: {}", moduleLoadPaths.size(), registryPath.wstring());
+            return moduleLoadPaths;
+        }
+        catch (...)
+        {
+            Logger::warn(L"Failed to parse module registry: {}", registryPath.wstring());
+            return std::nullopt;
+        }
+    }
+
+    std::vector<std::wstring> get_module_load_paths()
+    {
+        for (const auto& registryPath : get_module_registry_candidate_paths())
+        {
+            if (auto registryModules = try_load_module_registry(registryPath))
+            {
+                return *registryModules;
+            }
+        }
+
+        Logger::info(L"Using built-in module load list");
+        return get_default_module_load_paths();
+    }
 }
 
 void chdir_current_executable()
@@ -253,42 +382,7 @@ int runner(bool isProcessElevated, bool openSettings, std::string settingsWindow
 
         // Load PowerToys DLLs
 
-        std::vector<std::wstring_view> knownModules = {
-            L"PowerToys.FancyZonesModuleInterface.dll",
-            L"PowerToys.powerpreview.dll",
-            L"WinUI3Apps/PowerToys.ImageResizerExt.dll",
-            L"PowerToys.KeyboardManager.dll",
-            L"PowerToys.Launcher.dll",
-            L"WinUI3Apps/PowerToys.PowerRenameExt.dll",
-            L"PowerToys.ShortcutGuideModuleInterface.dll",
-            L"PowerToys.ColorPicker.dll",
-            L"PowerToys.AwakeModuleInterface.dll",
-            L"PowerToys.FindMyMouse.dll",
-            L"PowerToys.MouseHighlighter.dll",
-            L"PowerToys.MouseJump.dll",
-            L"PowerToys.AlwaysOnTopModuleInterface.dll",
-            L"PowerToys.MousePointerCrosshairs.dll",
-            L"PowerToys.CursorWrap.dll",
-            L"PowerToys.PowerAccentModuleInterface.dll",
-            L"PowerToys.PowerOCRModuleInterface.dll",
-            L"PowerToys.AdvancedPasteModuleInterface.dll",
-            L"WinUI3Apps/PowerToys.FileLocksmithExt.dll",
-            L"WinUI3Apps/PowerToys.RegistryPreviewExt.dll",
-            L"WinUI3Apps/PowerToys.MeasureToolModuleInterface.dll",
-            L"WinUI3Apps/PowerToys.NewPlus.ShellExtension.dll",
-            L"WinUI3Apps/PowerToys.HostsModuleInterface.dll",
-            L"WinUI3Apps/PowerToys.Peek.dll",
-            L"WinUI3Apps/PowerToys.EnvironmentVariablesModuleInterface.dll",
-            L"PowerToys.MouseWithoutBordersModuleInterface.dll",
-            L"PowerToys.CropAndLockModuleInterface.dll",
-            L"PowerToys.CmdNotFoundModuleInterface.dll",
-            L"PowerToys.WorkspacesModuleInterface.dll",
-            L"PowerToys.CmdPalModuleInterface.dll",
-            L"PowerToys.ZoomItModuleInterface.dll",
-            L"PowerToys.LightSwitchModuleInterface.dll",
-            L"PowerToys.PowerDisplayModuleInterface.dll",
-            L"PowerToys.GrabAndMoveModuleInterface.dll",
-        };
+        const auto knownModules = get_module_load_paths();
 
         for (auto moduleSubdir : knownModules)
         {
@@ -305,7 +399,7 @@ int runner(bool isProcessElevated, bool openSettings, std::string settingsWindow
 #ifdef _DEBUG
                 // In debug mode, simply log the warning and continue execution.
                 // This contrasts with the past approach where developers had to build all modules
-                // without errors before debugging—slowing down quick clone-and-fix iterations.
+                // without errors before debugging - slowing down quick clone-and-fix iterations.
                 Logger::warn(L"Debug mode: {}", errorMessage);
 #else
                 // In release mode, show error dialog as before
