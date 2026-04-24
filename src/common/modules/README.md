@@ -9,6 +9,25 @@ The first registry version is intentionally data-only. It mirrors the module int
 - Keep the existing runner loading flow intact.
 - Keep GPO, hotkey conflict handling, IPC, installer registration, and shell extensions explicitly registered in their current locations.
 - Use `ModuleRegistry.json` as the single reviewable source for the future registry shape before wiring it into runtime code.
+- Use `EnabledModules.personal.json` as the first personal profile for modules that should eventually be visible and loaded in this fork.
+
+## Personal profile
+
+`EnabledModules.personal.json` is intentionally allowed to mention planned modules before their implementations exist. The runner must not consume this profile until it has validation and fallback behavior.
+
+Current profile intent:
+
+| Module | Status | Notes |
+|--------|--------|-------|
+| `Launcher` | Existing upstream module | Keep PowerToys Run first. |
+| `PowerOCR` | Existing upstream module | Keep until `FastOCR` is ready. |
+| `ColorPicker` | Existing upstream module | Keep until `FastColorPicker` is ready. |
+| `PidShower` | Planned personal module | Build first to validate custom module plumbing. |
+| `AltSnap` | Planned personal module | Wrap AltSnap-style behavior behind an isolated service. |
+| `VoiceInput` | Planned personal module | Local Whisper-style speech-to-text. |
+| `FastOCR` | Planned personal module | Future replacement for PowerOCR. |
+| `FastColorPicker` | Planned personal module | Future replacement for Color Picker. |
+| `SnippingStudio` | Planned personal module | Screenshot and annotation workflow. |
 
 ## Migration order
 
