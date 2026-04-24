@@ -5,20 +5,54 @@
   </picture>
 </p>
 <h1 align="center">
-  <span>Microsoft PowerToys</span>
+  <span>NPCMike PowerToys Fork</span>
 </h1>
 <p align="center">
-  <span align="center">Microsoft PowerToys is a collection of utilities that help you customize Windows and streamline everyday tasks.</span>
+  <span align="center">A personal Windows productivity toolbox fork based on Microsoft PowerToys.</span>
 </p>
 <h3 align="center">
-  <a href="#-installation">Installation</a>
+  <a href="#-project-status">Project status</a>
   <span> · </span>
-  <a href="https://aka.ms/powertoys-docs">Documentation</a>
+  <a href="#-personal-roadmap">Personal roadmap</a>
   <span> · </span>
-  <a href="https://aka.ms/powertoys-releaseblog">Blog</a>
+  <a href="./doc/devdocs/development/personal-powertoys-fork-plan.zh-TW.md">Fork plan</a>
   <span> · </span>
-  <a href="#-whats-new">Release notes</a>
+  <a href="https://github.com/microsoft/PowerToys">Upstream</a>
 </h3>
+
+## 🧭 Project status
+
+This repository is NPCMike's personal fork of [Microsoft PowerToys](https://github.com/microsoft/PowerToys). The current goal is to keep the stable PowerToys runner, settings UI, module interface, hotkey handling, and shared libraries while gradually turning the project into a smaller personal productivity platform.
+
+The fork currently keeps the upstream PowerToys codebase intact. Early work is focused on documentation, build reproducibility, and low-risk architecture preparation before changing the runner or adding new modules.
+
+For the detailed implementation plan, see [個人化 PowerToys Fork 架構改造計畫](./doc/devdocs/development/personal-powertoys-fork-plan.zh-TW.md).
+
+## 🛠️ Personal roadmap
+
+Planned direction:
+
+| Area | Initial plan |
+|------|--------------|
+| PowerToys Run | Keep the existing launcher first, then evaluate whether to keep, reshape, or replace it. |
+| AltSnap-style window control | Add a separate module interface and run the window-control logic in an isolated service. |
+| Whisper voice input | Add a `VoiceInput` module for local speech-to-text and quick paste workflows. |
+| OCR | Keep PowerOCR initially, then add a faster personal OCR module before replacing it. |
+| Color Picker | Keep the existing module initially, then build a faster personal color picker. |
+| Snipping and annotation | Add a later-stage screenshot, mosaic, drawing, and pinned-image tool inspired by Snipaste-style workflows. |
+| PID Shower | Build this first as the smallest complete personal module to validate registry, settings, hotkey, service, and overlay patterns. |
+
+## ⬆️ Upstream relationship
+
+This project is based on Microsoft PowerToys and keeps `upstream` pointed at the official repository. The intended workflow is:
+
+```powershell
+git fetch upstream
+git switch main
+git merge upstream/main
+```
+
+As this fork diverges, upstream changes may be merged selectively instead of always taking the full upstream branch.
 
 ## 🔨 Utilities
 
