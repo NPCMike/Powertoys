@@ -9,11 +9,11 @@ The first registry version is intentionally data-only. It mirrors the module int
 - Keep the existing runner loading flow intact.
 - Keep GPO, hotkey conflict handling, IPC, installer registration, and shell extensions explicitly registered in their current locations.
 - Use `ModuleRegistry.json` as the single reviewable source for the future registry shape before wiring it into runtime code.
-- Use `EnabledModules.personal.json` as the first personal profile for modules that should eventually be visible and loaded in this fork.
+- Use `EnabledModules.personal.json` as the first personal profile for modules that should be loaded in this fork when they exist in the registry.
 
 ## Personal profile
 
-`EnabledModules.personal.json` is intentionally allowed to mention planned modules before their implementations exist. The runner must not consume this profile until it has validation and fallback behavior.
+`EnabledModules.personal.json` is intentionally allowed to mention planned modules before their implementations exist. The runner consumes the profile only as a whitelist over `ModuleRegistry.json`: matching registry entries are loaded, planned module ids are logged and ignored until they have registry entries, and invalid or missing profile data falls back to the full registry load list.
 
 Current profile intent:
 
@@ -34,7 +34,8 @@ Current profile intent:
 1. Record current module load metadata in `ModuleRegistry.json`.
 2. Add an enabled-modules profile for the personal fork.
 3. Teach the runner to read DLL load paths from the registry with a hard-coded fallback.
-4. Move settings page mapping after the runner path is stable.
-5. Leave GPO, installer, hotkey, and IPC migration for later explicit phases.
+4. Filter runner module loading through `EnabledModules.personal.json` with registry fallback behavior.
+5. Move settings page mapping after the runner path is stable.
+6. Leave GPO, installer, hotkey, and IPC migration for later explicit phases.
 
 This keeps the first step low-risk while still giving future module add/remove work a concrete place to converge.

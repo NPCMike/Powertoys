@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iterator>
 #include <sstream>
+#include <unordered_set>
 #include "tray_icon.h"
 #include "powertoy_module.h"
 #include "trace.h"
@@ -70,6 +71,7 @@ namespace
     const wchar_t PT_URI_PROTOCOL_SCHEME[] = L"powertoys://";
     const wchar_t POWER_TOYS_MODULE_LOAD_FAIL[] = L"Failed to load "; // Module name will be appended on this message and it is not localized.
     const wchar_t MODULE_REGISTRY_FILE_NAME[] = L"ModuleRegistry.json";
+    const wchar_t ENABLED_MODULES_PROFILE_FILE_NAME[] = L"EnabledModules.personal.json";
 
     std::vector<std::wstring> get_default_module_load_paths()
     {
@@ -109,6 +111,65 @@ namespace
             L"PowerToys.PowerDisplayModuleInterface.dll",
             L"PowerToys.GrabAndMoveModuleInterface.dll",
         };
+    }
+
+    std::optional<std::unordered_set<std::wstring>> try_load_enabled_module_profile(const std::filesystem::path& profilePath)
+    {
+        try
+        {
+            if (!std::filesystem::exists(profilePath))
+            {
+                return std::nullopt;
+            }
+
+            std::ifstream file(profilePath, std::ios::binary);
+            if (!file.is_open())
+            {
+                Logger::warn(L"Enabled modules profile exists but cannot be opened: {}", profilePath.wstring());
+                return std::nullopt;
+            }
+
+            const std::string profileJson{ std::istreambuf_iterator<char>{ file }, std::istreambuf_iterator<char>{} };
+            const auto profileValue = json::JsonValue::Parse(winrt::to_hstring(profileJson));
+            if (profileValue.ValueType() != json::JsonValueType::Array)
+            {
+                Logger::warn(L"Enabled modules profile is not a JSON array: {}", profilePath.wstring());
+                return std::nullopt;
+            }
+
+            std::unordered_set<std::wstring> enabledModuleIds;
+            for (const auto& moduleIdValue : profileValue.GetArray())
+            {
+                if (moduleIdValue.ValueType() != json::JsonValueType::String)
+                {
+                    Logger::warn(L"Enabled modules profile contains a non-string entry: {}", profilePath.wstring());
+                    return std::nullopt;
+                }
+
+                const std::wstring moduleId = moduleIdValue.GetString().c_str();
+                if (moduleId.empty())
+                {
+                    Logger::warn(L"Enabled modules profile contains an empty module id: {}", profilePath.wstring());
+                    return std::nullopt;
+                }
+
+                enabledModuleIds.emplace(moduleId);
+            }
+
+            if (enabledModuleIds.empty())
+            {
+                Logger::warn(L"Enabled modules profile has no enabled module ids: {}", profilePath.wstring());
+                return std::nullopt;
+            }
+
+            Logger::info(L"Loaded {} enabled module ids from profile: {}", enabledModuleIds.size(), profilePath.wstring());
+            return enabledModuleIds;
+        }
+        catch (...)
+        {
+            Logger::warn(L"Failed to parse enabled modules profile: {}", profilePath.wstring());
+            return std::nullopt;
+        }
     }
 
     std::vector<std::filesystem::path> get_module_registry_candidate_paths()
@@ -182,10 +243,101 @@ namespace
         }
     }
 
+    std::optional<std::vector<std::wstring>> try_load_module_registry(const std::filesystem::path& registryPath, const std::unordered_set<std::wstring>& enabledModuleIds)
+    {
+        try
+        {
+            if (!std::filesystem::exists(registryPath))
+            {
+                return std::nullopt;
+            }
+
+            std::ifstream file(registryPath, std::ios::binary);
+            if (!file.is_open())
+            {
+                Logger::warn(L"Module registry exists but cannot be opened: {}", registryPath.wstring());
+                return std::nullopt;
+            }
+
+            const std::string registryJson{ std::istreambuf_iterator<char>{ file }, std::istreambuf_iterator<char>{} };
+            const auto registryValue = json::JsonValue::Parse(winrt::to_hstring(registryJson));
+            if (registryValue.ValueType() != json::JsonValueType::Array)
+            {
+                Logger::warn(L"Module registry is not a JSON array: {}", registryPath.wstring());
+                return std::nullopt;
+            }
+
+            std::vector<std::wstring> moduleLoadPaths;
+            std::unordered_set<std::wstring> matchedEnabledModuleIds;
+            for (const auto& moduleValue : registryValue.GetArray())
+            {
+                if (moduleValue.ValueType() != json::JsonValueType::Object)
+                {
+                    Logger::warn(L"Module registry contains a non-object entry: {}", registryPath.wstring());
+                    return std::nullopt;
+                }
+
+                const auto moduleObject = moduleValue.GetObjectW();
+                const std::wstring moduleId = moduleObject.GetNamedString(L"id", L"").c_str();
+                if (moduleId.empty())
+                {
+                    Logger::warn(L"Module registry entry is missing id: {}", registryPath.wstring());
+                    return std::nullopt;
+                }
+
+                if (!enabledModuleIds.contains(moduleId))
+                {
+                    continue;
+                }
+
+                const std::wstring loadPath = moduleObject.GetNamedString(L"loadPath", L"").c_str();
+                if (loadPath.empty())
+                {
+                    Logger::warn(L"Module registry entry is missing loadPath: {}", registryPath.wstring());
+                    return std::nullopt;
+                }
+
+                matchedEnabledModuleIds.emplace(moduleId);
+                moduleLoadPaths.emplace_back(loadPath);
+            }
+
+            if (moduleLoadPaths.empty())
+            {
+                Logger::warn(L"Module registry has no entries matching enabled modules profile: {}", registryPath.wstring());
+                return std::nullopt;
+            }
+
+            for (const auto& enabledModuleId : enabledModuleIds)
+            {
+                if (!matchedEnabledModuleIds.contains(enabledModuleId))
+                {
+                    Logger::info(L"Enabled modules profile references module id not found in registry: {}", enabledModuleId);
+                }
+            }
+
+            Logger::info(L"Loaded {} module entries from registry after applying enabled modules profile: {}", moduleLoadPaths.size(), registryPath.wstring());
+            return moduleLoadPaths;
+        }
+        catch (...)
+        {
+            Logger::warn(L"Failed to parse module registry: {}", registryPath.wstring());
+            return std::nullopt;
+        }
+    }
+
     std::vector<std::wstring> get_module_load_paths()
     {
         for (const auto& registryPath : get_module_registry_candidate_paths())
         {
+            const std::filesystem::path profilePath = registryPath.parent_path() / ENABLED_MODULES_PROFILE_FILE_NAME;
+            if (const auto enabledModuleIds = try_load_enabled_module_profile(profilePath))
+            {
+                if (auto registryModules = try_load_module_registry(registryPath, *enabledModuleIds))
+                {
+                    return *registryModules;
+                }
+            }
+
             if (auto registryModules = try_load_module_registry(registryPath))
             {
                 return *registryModules;
